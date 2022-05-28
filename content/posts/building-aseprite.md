@@ -1,6 +1,7 @@
 ---
 title: "Building Aseprite from source without using Visual Studio for Windows"
 date: 2022-05-12T20:56:13+08:00
+draft: true
 taxonomies:
     category: guide
     tag: aseprite, CLI, pixel-art
