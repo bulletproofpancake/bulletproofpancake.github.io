@@ -1,0 +1,47 @@
+baseURL: http://bulletproofpancake.github.io/
+languageCode: en-us
+title: My Portfolio
+theme: "PaperMod"
+
+enableGitInfo: true
+
+params:
+    author: ["Jolo Gutierrez"]
+
+    assets:
+        favicon16x16:  "favicon/favicon-16x16.png"
+        favicon32x32:  "favicon/favicon-32x32.png"
+
+    profileMode:
+        enabled: true
+        title: "Jolo Gutierrez" # optional default will be site title
+        subtitle: "Game Developer. Batangueño."
+        imageUrl: "images/profilepic.jpg" # optional
+        imageTitle: "ProfilePic" # optional
+        imageWidth: 120 # custom size
+        imageHeight: 120 # custom size
+        buttons:
+            - name: Posts
+              url: "posts/"
+            - name: Github
+              url: "https://github.com/bulletproofpancake/"
+            - name: Itch.io
+              url: "https://bulletproofpancake.itch.io/"
+    
+    editPost:
+        URL: "https://github.com/bulletproofpancake/blog/blob/main/content"
+        Text: "Suggest Changes" # edit text
+        appendFilePath: true # to append file path to Edit link
+
+    ShowPostNavLinks: true
+
+    ShowBreadCrumbs: true
+    
+    ShowCodeCopyButtons: true
+
+    ShowReadingTime: true
+
+menu:
+  main:
+    - name: About Me
+      url: /about/
