@@ -26,6 +26,12 @@ params:
       url: "https://github.com/bulletproofpancake/"
     - name: itchio
       url: "https://bulletproofpancake.itch.io/"
+    - name: linkedin
+      url: "https://www.linkedin.com/in/mjgutierreziii"
+    - name: email
+      url: "mailto:jgutierrez1100@gmail.com"
+    - name: discord
+      url: "https://www.discord.com/users/592223470763638784"
 
   editPost:
     URL: "https://github.com/bulletproofpancake/blog/blob/main/content"
