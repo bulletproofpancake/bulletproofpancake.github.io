@@ -48,6 +48,8 @@ params:
 
   ShowShareButtons: true
 
+  ShowToc: true
+
   ShareButtons: ["linkedin", "reddit", "twitter", "facebook"]
 
 menu:
