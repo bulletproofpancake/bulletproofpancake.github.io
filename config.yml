@@ -1,6 +1,6 @@
 baseURL: http://bulletproofpancake.github.io/
 languageCode: en-us
-title: My Blog
+title: ReadLine
 theme: "PaperMod"
 
 enableGitInfo: true
