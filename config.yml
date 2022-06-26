@@ -1,6 +1,6 @@
 baseURL: http://bulletproofpancake.github.io/
 languageCode: en-us
-title: My Blog
+title: ReadLine
 theme: "PaperMod"
 
 enableGitInfo: true
@@ -34,7 +34,7 @@ params:
       url: "https://www.discord.com/users/592223470763638784"
 
   editPost:
-    URL: "https://github.com/bulletproofpancake/blog/blob/main/content"
+    URL: "https://github.com/bulletproofpancake/bulletproofpancake.github.io/blob/main/content"
     Text: "Suggest Changes" # edit text
     appendFilePath: true # to append file path to Edit link
 
@@ -47,6 +47,8 @@ params:
   ShowReadingTime: true
 
   ShowShareButtons: true
+
+  ShowToc: true
 
   ShareButtons: ["linkedin", "reddit", "twitter", "facebook"]
 
