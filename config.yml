@@ -9,14 +9,14 @@ params:
   author: ["Jolo Gutierrez"]
 
   assets:
-    favicon16x16: "favicon/favicon-16x16.png"
-    favicon32x32: "favicon/favicon-32x32.png"
+    favicon16x16: "https://i.imgur.com/ionarhS.png"
+    favicon32x32: "https://i.imgur.com/Jo1I9xQ.png"
 
   profileMode:
     enabled: true
     title: "Jolo Gutierrez" # optional default will be site title
     subtitle: "Game Developer. Batangueño."
-    imageUrl: "images/profilepic.jpg" # optional
+    imageUrl: "https://i.imgur.com/ae6QJsY.jpg" # optional
     imageTitle: "ProfilePic" # optional
     imageWidth: 240 # custom size
     imageHeight: 240 # custom size
