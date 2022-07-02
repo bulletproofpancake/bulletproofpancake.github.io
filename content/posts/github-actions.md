@@ -36,7 +36,7 @@ jobs:
         avatar_url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
 ```
 
-## Generating a documentation site with DocFX
+## Setting up a runner to generate a documentation site with DocFX
 
 ```yml
 name: DocFX Build and Publish
@@ -73,7 +73,7 @@ jobs:
           force_orphan: true
 ```
 
-## Building the game with Game-CI
+## Setting up a runner and using bash scripts to build the game with Game-CI
 
 ```yml
 name: Build Project
@@ -119,9 +119,6 @@ jobs:
           token: ${{ secrets.API_TOKEN_GITHUB }}
 
       - name: Compress and copy build to public repo
-        # uses: edgarrc/action-7z@v1
-        # with:
-        #   args: 7z a -t7z -mx=9 ${{ steps.build.outputs.buildVersion }}.7z ./build/StandaloneWindows64/*
         run: |
           chmod +x .github/scripts/split-zipper.sh
           ./.github/scripts/split-zipper.sh ./build/StandaloneWindows64 100 public-builds/build/StandaloneWindows64/${{ steps.build.outputs.buildVersion }} ${{ steps.build.outputs.buildVersion }}
