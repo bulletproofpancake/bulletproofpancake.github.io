@@ -14,8 +14,128 @@ So what is Github Actions anyway? Basically, it is a set of instructions that ge
 
 > I would like to preface that while [Github Actions is free for public repositories (labeled as CI/CD minutes)](https://github.com/pricing) it can still be used in private repositories by [self-hosting runners](https://docs.github.com/en/enterprise-server@3.2/actions/hosting-your-own-runners/about-self-hosted-runners) and it would [not get counted as used minutes](https://github.community/t/does-using-self-hosted-runners-add-to-action-minutes-usage/18281), however this would require you having another computer available to host a runner.
 
-## Building the game with Game-CI
+# Writing workflows
 
+## Notifying your Discord Server using an existing action
 
+```yml
+name: Notify Discord
+on:
+  push:
+    branches: [main]
+jobs:
+  notify-discord:
+    name: Notify Discord
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: sarisia/actions-status-discord@v1.9.0
+      if: always()
+      with:
+        webhook: ${{secrets.DISCORD_WEBHOOK}}
+        avatar_url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+```
 
 ## Generating a documentation site with DocFX
+
+```yml
+name: DocFX Build and Publish
+
+on:
+  push:
+    branches: [ main ]
+    
+jobs:
+  generate-docs:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+      - name: Setup DocFX
+        uses: crazy-max/ghaction-chocolatey@v1
+        with:
+          args: install docfx
+      - name: DocFX Build
+        working-directory: Documentation
+        run: docfx docfx.json
+        continue-on-error: false
+      - name: Publish
+        if: github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: Documentation/_site
+          force_orphan: true
+```
+
+## Building the game with Game-CI
+
+```yml
+name: Build Project
+on:
+  push:
+    branches: [release]
+  pull_request:
+    branches: [release]
+  workflow_dispatch:
+
+jobs:
+  build-standalone-windows-64:
+    name: Build Standalone Windows 64
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      - name: Build StandaloneWindows64
+        uses: game-ci/unity-builder@v2
+        id: build
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          targetPlatform: StandaloneWindows64
+          versioning: Semantic
+
+      - name: Clone public repo
+        uses: actions/checkout@v3
+        with:
+          repository: WoahPieStudios/GDELECT4-ADVAPROD-BUILDS
+          path: public-builds
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+
+      - name: Compress and copy build to public repo
+        # uses: edgarrc/action-7z@v1
+        # with:
+        #   args: 7z a -t7z -mx=9 ${{ steps.build.outputs.buildVersion }}.7z ./build/StandaloneWindows64/*
+        run: |
+          chmod +x .github/scripts/split-zipper.sh
+          ./.github/scripts/split-zipper.sh ./build/StandaloneWindows64 100 public-builds/build/StandaloneWindows64/${{ steps.build.outputs.buildVersion }} ${{ steps.build.outputs.buildVersion }}
+
+      - name: Push build to public repo
+        run: |
+          cd public-builds
+          git config user.name bulletproofpancake
+          git config user.email 57520402+bulletproofpancake@users.noreply.github.com
+          git add .
+          git commit -m "Update from https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          git push --force
+
+      - name: Return License
+        uses: game-ci/unity-return-license@v2
+        if: always()
+```
