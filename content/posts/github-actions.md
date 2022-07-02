@@ -16,25 +16,101 @@ So what is Github Actions anyway? Basically, it is a set of instructions that ge
 
 # Writing workflows
 
+```yml
+# This is a basic workflow to help you get started with Actions
+
+name: Demo Workflow
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the $default-branch branch
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
+```
+
 ## Notifying your Discord Server using an existing action
+
+During development our team has chosen Discord as our means of communication for the project. Given that I instructed the team to only create branches from main to ensure that everyone has the latest changes, I found myself still creating branches from an outdated version of main because I was unaware that there has been new changes in remote. Thankfully, setting up a bot in Discord to notify a channel whenever main is updated is easy. For this, I used [sarisia's action](https://github.com/marketplace/actions/actions-status-discord) which only needs a Discord Webhook in the repository environment.
+
+To create a Discord Webhook:
+1. Create a channel where you would send your messages to, and then edit it's settings.
+    
+    ![](https://i.imgur.com/C2EHOxD.gif)
+
+2. Select the Integrations tab
+    
+    ![](https://i.imgur.com/laZNTzG.gif)
+
+3. Create a webhook and copy its url
+
+    ![](https://i.imgur.com/RVYb3z5.gif)
+
+4. In your Github repository, go to Settings > Secrets > Actions
+
+    ![](https://i.imgur.com/7EeqPtG.gif)
+
+5. Create a new repository secret, name it `DISCORD_WEBHOOK` and paste the webhook url into the value field
+   
+    ![](https://i.imgur.com/pk4hDPy.gif)
+
+Once that is done, we can now write our workflow file:
+
+> You can just paste this into your repository as long as you remember to place it in the `.github/workflows/` directory.
 
 ```yml
 name: Notify Discord
 on:
+  # Triggers the workflow when commits are pushed to main
   push:
     branches: [main]
+
 jobs:
   notify-discord:
     name: Notify Discord
     runs-on: ubuntu-latest
 
     steps:
+      # The action used to send notifications to Discord
     - uses: sarisia/actions-status-discord@v1.9.0
+      # Always sends a notification to the channel
       if: always()
       with:
+        # A webhook linked to the Discord Channel
         webhook: ${{secrets.DISCORD_WEBHOOK}}
+        # Changes the profile picture to Octocat
         avatar_url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
 ```
+
+If you have setup everything correctly, every time you push something to the `main` branch you should receive a notification from your bot like so:
+
+![](https://i.imgur.com/fkpRSjI.png)
 
 ## Setting up a runner to generate a documentation site with DocFX
 
