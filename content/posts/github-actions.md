@@ -12,9 +12,16 @@ Building projects are pretty simple, most of the time you just press a shortcut,
 
 So what is Github Actions anyway? Basically, it is a set of instructions that gets run on a computer depending on what has happened in your repository. You can [generate a documentation site for your code](https://dotnet.github.io/docfx/), [run shell scripts to use with your project](https://github.community/t/running-a-bash-script/141584), or even [make a build of your project](https://game.ci/docs/), and that is just what I used during the development of our thesis game [Get Guns, Go Grapple](https://github.com/WoahPieStudios/GDELECT4-ADVAPROD). There are a lot more things that you can do with it, for example: [this site is being made available to you thanks to Github Actions](https://github.com/bulletproofpancake/bulletproofpancake.github.io/actions). The possibilities are endless provided you know the tools available to you.
 
-> I would like to preface that while [Github Actions is free for public repositories (labeled as CI/CD minutes)](https://github.com/pricing) it can still be used in private repositories by [self-hosting runners](https://docs.github.com/en/enterprise-server@3.2/actions/hosting-your-own-runners/about-self-hosted-runners) and it would [not get counted as used minutes](https://github.community/t/does-using-self-hosted-runners-add-to-action-minutes-usage/18281), however this would require you having another computer available to host a runner.
+I would like to preface that while [Github Actions is free for public repositories (labeled as CI/CD minutes)](https://github.com/pricing) it can still be used in private repositories by [self-hosting runners](https://docs.github.com/en/enterprise-server@3.2/actions/hosting-your-own-runners/about-self-hosted-runners) and it would [not get counted as used minutes](https://github.community/t/does-using-self-hosted-runners-add-to-action-minutes-usage/18281), however this would require you having another computer available to host a runner.
+
+> As always, I would recommend reading the documentation about Github Actions [here](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions) for a more in-depth explanation as this article would mostly be a showcase of how I used it during the development of *Get Guns, Go Grapple*.
+
 
 # Writing workflows
+
+Workflows contain the details of your automation process. They contain the conditions when they will run, what system they would use, and the steps of the automation. They are YAML files and placed in the `.github/workflows/` directory that you can create at the root of your repository.
+
+The following is an example of a workflow file:
 
 ```yml
 # This is a basic workflow to help you get started with Actions
@@ -55,12 +62,49 @@ jobs:
           echo test, and deploy your project.
 ```
 
+## Setting up a runner to generate a documentation site with DocFX
+
+```yml
+name: DocFX Build and Publish
+
+on:
+  push:
+    branches: [ main ]
+    
+jobs:
+  generate-docs:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+      - name: Setup DocFX
+        uses: crazy-max/ghaction-chocolatey@v1
+        with:
+          args: install docfx
+      - name: DocFX Build
+        working-directory: Documentation
+        run: docfx docfx.json
+        continue-on-error: false
+      - name: Publish
+        if: github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: Documentation/_site
+          force_orphan: true
+```
+
 ## Notifying your Discord Server using an existing action
 
 During development our team has chosen Discord as our means of communication for the project. Given that I instructed the team to only create branches from main to ensure that everyone has the latest changes, I found myself still creating branches from an outdated version of main because I was unaware that there has been new changes in remote. Thankfully, setting up a bot in Discord to notify a channel whenever main is updated is easy. For this, I used [sarisia's action](https://github.com/marketplace/actions/actions-status-discord) which only needs a Discord Webhook in the repository environment.
 
 To create a Discord Webhook:
-1. Create a channel where you would send your messages to, and then edit it's settings.
+1. Create a channel where you would send your messages to, and then edit its settings.
     
     ![](https://i.imgur.com/C2EHOxD.gif)
 
@@ -111,43 +155,6 @@ jobs:
 If you have setup everything correctly, every time you push something to the `main` branch you should receive a notification from your bot like so:
 
 ![](https://i.imgur.com/fkpRSjI.png)
-
-## Setting up a runner to generate a documentation site with DocFX
-
-```yml
-name: DocFX Build and Publish
-
-on:
-  push:
-    branches: [ main ]
-    
-jobs:
-  generate-docs:
-    runs-on: windows-latest
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.x
-      - name: Setup DocFX
-        uses: crazy-max/ghaction-chocolatey@v1
-        with:
-          args: install docfx
-      - name: DocFX Build
-        working-directory: Documentation
-        run: docfx docfx.json
-        continue-on-error: false
-      - name: Publish
-        if: github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: Documentation/_site
-          force_orphan: true
-```
 
 ## Setting up a runner and using bash scripts to build the game with Game-CI
 
