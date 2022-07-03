@@ -63,7 +63,8 @@ jobs:
 ```
 
 ## Generating a documentation site with DocFX
-[DocFX](https://dotnet.github.io/docfx/) is a static documentation generator. This means that it generates source code from the project and creates a site for it which can be uploaded to a server. As this article focuses on the utilization of Github Actions, I would recommend reading [Normand Erwan's guide for using DocFX with Unity](https://normanderwan.github.io/DocFxForUnity/) which I have referenced extensively for this. For this example, I used [Github Pages](https://pages.github.com) to host the documentation site and it is pretty easy to setup.
+
+When working with a team, it is important that the other members would have an idea how to interact with the project. While most of the time a call solves this, I still find it important to have something written down to reference later. As such I have found [DocFX](https://dotnet.github.io/docfx/) which is a static documentation generator. This means that it generates source code from the project through [XML comments](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/) and creates a site for it which can be uploaded to a server. Aside from just reading from the source code, you can also write manuals as well in the form of [Markdown](https://dotnet.github.io/docfx/spec/docfx_flavored_markdown.html?tabs=tabid-1%2Ctabid-a) files.  As this article focuses on the utilization of Github Actions, I would recommend reading [Normand Erwan's guide for using DocFX with Unity](https://normanderwan.github.io/DocFxForUnity/) which I have referenced extensively for this. For this example, I used [Github Pages](https://pages.github.com) to host the documentation site and it is pretty easy to setup.
 
 Once DocFX is set up in your project repository, we can now setup our workflow file:
 ```yml
@@ -118,6 +119,16 @@ The reason for this is that unlike our `main` branch or the other branches we ma
 
 ![](https://i.imgur.com/2CcyUTw.gif)
 
+If everything is done correctly, you should now be able to access your documentation site in the web.
+
+*API Documentation*
+
+![](https://i.imgur.com/R5LardG.png)
+
+*Systems Manual*
+
+![](https://i.imgur.com/kV82mgI.png)
+
 ## Notifying your Discord Server
 
 During development our team has chosen Discord as our means of communication for the project. Given that I instructed the team to only create branches from main to ensure that everyone has the latest changes, I found myself still creating branches from an outdated version of main because I was unaware that there has been new changes in remote. Thankfully, setting up a bot in Discord to notify a channel whenever main is updated is easy. For this, I used [sarisia's action](https://github.com/marketplace/actions/actions-status-discord) which only needs a Discord Webhook in the repository environment.
@@ -144,8 +155,6 @@ To create a Discord Webhook:
     ![](https://i.imgur.com/pk4hDPy.gif)
 
 Once that is done, we can now write our workflow file:
-
-> You can just paste this into your repository as long as you remember to place it in the `.github/workflows/` directory.
 
 ```yml
 name: Notify Discord
