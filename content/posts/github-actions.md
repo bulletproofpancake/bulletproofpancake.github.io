@@ -62,34 +62,46 @@ jobs:
           echo test, and deploy your project.
 ```
 
-## Setting up a runner to generate a documentation site with DocFX
+## Generating a documentation site with DocFX
+[DocFX](https://dotnet.github.io/docfx/) is a static documentation generator. This means that it generates source code from the project and creates a site for it which can be uploaded to a server. For this example, I used Github Pages to host the documentation site. As this article focuses on the utilization of Github Actions, I would recommend reading [Normand Erwan's guide for using DocFX with Unity](https://normanderwan.github.io/DocFxForUnity/) which I have referenced extensively for this.
 
+Once DocFX is set up in your project repository, we can now setup our workflow file:
 ```yml
 name: DocFX Build and Publish
-
 on:
+  # Triggers the workflow when commits are pushed to main
   push:
     branches: [ main ]
     
 jobs:
   generate-docs:
+    # uses a windows machine to run the job
     runs-on: windows-latest
     
     steps:
+      # Clones the repository to the workspace
       - name: Checkout
         uses: actions/checkout@v2
+      
+      # Installs .NET Core which is used by DocFXs
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.x
+      
+      # Uses the chocolatey package manager to install DocFX
       - name: Setup DocFX
         uses: crazy-max/ghaction-chocolatey@v1
         with:
           args: install docfx
+      
+      # Uses DocFX to build the documentation site
       - name: DocFX Build
         working-directory: Documentation
         run: docfx docfx.json
         continue-on-error: false
+      
+      # Publishes the built site on Github Actions
       - name: Publish
         if: github.event_name == 'push'
         uses: peaceiris/actions-gh-pages@v3
@@ -99,7 +111,7 @@ jobs:
           force_orphan: true
 ```
 
-## Notifying your Discord Server using an existing action
+## Notifying your Discord Server
 
 During development our team has chosen Discord as our means of communication for the project. Given that I instructed the team to only create branches from main to ensure that everyone has the latest changes, I found myself still creating branches from an outdated version of main because I was unaware that there has been new changes in remote. Thankfully, setting up a bot in Discord to notify a channel whenever main is updated is easy. For this, I used [sarisia's action](https://github.com/marketplace/actions/actions-status-discord) which only needs a Discord Webhook in the repository environment.
 
@@ -156,7 +168,7 @@ If you have setup everything correctly, every time you push something to the `ma
 
 ![](https://i.imgur.com/fkpRSjI.png)
 
-## Setting up a runner and using bash scripts to build the game with Game-CI
+## Building and Deploying the game with Game-CI
 
 ```yml
 name: Build Project
